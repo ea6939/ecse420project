@@ -1,29 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "common.h"
 
 int m = 50; //Number of rows in the image
 int n = 100; //Number of columns in the image
 int b; //Size of the block
 int step_size_initial = 16;
 
-//Previous image RGB
-int **img_prev_r;
-int **img_prev_g;
-int **img_prev_b;
-
-//Current image RGB
-int **img_curr_r;
-int **img_curr_g;
-int **img_curr_b;
-
-typedef struct {
-	int R;
-	int G;
-	int B;
-} RGB;
+RGB **img_prev; //Previous image RGB
+RGB **img_curr; //Current image RGB
 
 void store_images();
-void load_images();
 void process_images();
 int compute_sum_rgb();
 RGB ** allocatePixelMatrix (int x, int y);
@@ -38,7 +25,7 @@ BLOCKS:
 int main(int argc, char *argv[]) {
 	srand(100);
 	if(argc != 2) {
-		printf("Usage: ./pp <Block size>\n");
+		printf("Usage: ./serialProgram <Block size>\n");
 		exit(1);
 	}
 
@@ -46,102 +33,21 @@ int main(int argc, char *argv[]) {
 
 	store_images();
 
-	//load_images();
-
 	process_images();
 }
 
 void store_images() {
-	int i, j;
+	img_prev = allocatePixelMatrix(m,n);
+	img_curr = allocatePixelMatrix(m,n);
 
-	printf("Storing images in matrices...\n");
 
-	//Allocates memory to the matrices
-	img_prev_r = (int **)malloc(m * sizeof(int*));
-	img_prev_g = (int **)malloc(m * sizeof(int*));
-	img_prev_b = (int **)malloc(m * sizeof(int*));
-
-	img_curr_r = (int **)malloc(m * sizeof(int*));
-	img_curr_g = (int **)malloc(m * sizeof(int*));
-	img_curr_b = (int **)malloc(m * sizeof(int*));
-
-	for(i = 0; i < m; i++) {
-		img_prev_r[i] = (int *)malloc(n * sizeof(int));
-		img_prev_g[i] = (int *)malloc(n * sizeof(int));
-		img_prev_b[i] = (int *)malloc(n * sizeof(int));
-
-		img_curr_r[i] = (int *)malloc(n * sizeof(int));
-		img_curr_g[i] = (int *)malloc(n * sizeof(int));
-		img_curr_b[i] = (int *)malloc(n * sizeof(int));
-	}
-
-	//Initializes matrices to 0
-	for(i = 0; i < m; i++) {
-		for(j = 0; j < n; j++) {
-			img_prev_r[i][j] = 0;
-			img_prev_g[i][j] = 0;
-			img_prev_b[i][j] = 0;
-
-			img_curr_r[i][j] = 0;
-			img_curr_g[i][j] = 0;
-			img_curr_b[i][j] = 0;
-		}
-	}
-
+	// FRANK'S TEST BELOW -- WILL EVENTUALLY BE DELETED
 	int test = rand() % 50;
 	//prev (33,63), curr (33,78)
-	img_prev_r[test][test+30] = 100;
-	img_prev_g[test][test+30] = 100;
-	img_curr_r[test][test+45] = 100;
-	img_curr_g[test][test+45] = 100;
-	printf("TEST %d\n", test);
-}
-
-void load_images() {
-	int i, j;
-
-	printf("Loading images in matrices...\n");
-
-	//Bitmap bitmap = new Bitmap(@"")
-
-	//Allocates memory to the matrices
-	img_prev_r = (int **)malloc(m * sizeof(int*));
-	img_prev_g = (int **)malloc(m * sizeof(int*));
-	img_prev_b = (int **)malloc(m * sizeof(int*));
-
-	img_curr_r = (int **)malloc(m * sizeof(int*));
-	img_curr_g = (int **)malloc(m * sizeof(int*));
-	img_curr_b = (int **)malloc(m * sizeof(int*));
-
-	for(i = 0; i < m; i++) {
-		img_prev_r[i] = (int *)malloc(n * sizeof(int));
-		img_prev_g[i] = (int *)malloc(n * sizeof(int));
-		img_prev_b[i] = (int *)malloc(n * sizeof(int));
-
-		img_curr_r[i] = (int *)malloc(n * sizeof(int));
-		img_curr_g[i] = (int *)malloc(n * sizeof(int));
-		img_curr_b[i] = (int *)malloc(n * sizeof(int));
-	}
-
-	//Initializes matrices to 0
-	for(i = 0; i < m; i++) {
-		for(j = 0; j < n; j++) {
-			img_prev_r[i][j] = 0;
-			img_prev_g[i][j] = 0;
-			img_prev_b[i][j] = 0;
-
-			img_curr_r[i][j] = 0;
-			img_curr_g[i][j] = 0;
-			img_curr_b[i][j] = 0;
-		}
-	}
-
-	int test = rand() % 50;
-	//prev (33,63), curr (33,78)
-	img_prev_r[test][test+30] = 100;
-	img_prev_g[test][test+30] = 100;
-	img_curr_r[test][test+45] = 100;
-	img_curr_g[test][test+45] = 100;
+	img_prev[test][test+30].R = 100;
+	img_prev[test][test+30].G = 100;
+	img_curr[test][test+45].R = 100;
+	img_curr[test][test+45].G = 100;
 	printf("TEST %d\n", test);
 }
 
@@ -245,14 +151,14 @@ int compute_sum_rgb(int k, int l, int curr) {
 	for(i = k; i < k + b; i++) {
 		for(j = l; j < l + b; j++) {
 			if(curr == 0) {
-				total_RGB += img_prev_r[i][j];
-				total_RGB += img_prev_g[i][j];
-				total_RGB += img_prev_b[i][j];
+				total_RGB += img_prev[i][j].R;
+				total_RGB += img_prev[i][j].G;
+				total_RGB += img_prev[i][j].B;
 			}
 			else if(curr == 1) {
-				total_RGB += img_curr_r[i][j];
-				total_RGB += img_curr_g[i][j];
-				total_RGB += img_curr_b[i][j];
+				total_RGB += img_curr[i][j].R;
+				total_RGB += img_curr[i][j].G;
+				total_RGB += img_curr[i][j].B;
 			}
 			else {
 				printf("Error reading block due to the input matrix\n");
@@ -263,15 +169,4 @@ int compute_sum_rgb(int k, int l, int curr) {
 	}
 	//printf("Block %d %d %d: %d\n", k, l, curr, total_RGB);
 	return total_RGB;
-}
-
-RGB ** allocatePixelMatrix (int x, int y)
-{
-  int i;
-  RGB **matrix;
-  matrix = (RGB **)malloc(x * sizeof(RGB*));
-  for (i=0; i<x; i++)
-    matrix[i] = (RGB *) malloc(y * sizeof(RGB));
-
-  return matrix;
 }
