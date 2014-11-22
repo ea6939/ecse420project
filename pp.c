@@ -16,10 +16,17 @@ int **img_curr_r;
 int **img_curr_g;
 int **img_curr_b;
 
+typedef struct {
+	int R;
+	int G;
+	int B;
+} RGB;
+
 void store_images();
 void load_images();
 void process_images();
 int compute_sum_rgb();
+RGB ** allocatePixelMatrix (int x, int y);
 
 /*
 BLOCKS:
@@ -256,4 +263,15 @@ int compute_sum_rgb(int k, int l, int curr) {
 	}
 	//printf("Block %d %d %d: %d\n", k, l, curr, total_RGB);
 	return total_RGB;
+}
+
+RGB ** allocatePixelMatrix (int x, int y)
+{
+  int i;
+  RGB **matrix;
+  matrix = (RGB **)malloc(x * sizeof(RGB*));
+  for (i=0; i<x; i++)
+    matrix[i] = (RGB *) malloc(y * sizeof(RGB));
+
+  return matrix;
 }
