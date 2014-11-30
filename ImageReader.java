@@ -1,0 +1,56 @@
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.imageio.ImageIO;
+
+public class ImageReader {
+	public static void main(String[] args) {
+		File imgFile;
+		String imgFolder = "images";
+		BufferedImage img;
+
+		if(args.length != 1) {
+			System.out.println("Usage: java ImageReader <filename>");
+			System.exit(0);
+		}
+
+		imgFile = new File(imgFolder + "/" + args[0]);
+		if(imgFile.exists()) {
+			try {
+				img = ImageIO.read(imgFile);
+
+				readImage(img);
+			}
+			catch(IOException e) {}
+		}
+		else {
+			System.out.println("Image file not found.");
+			System.exit(0);
+		}
+	}
+
+	static void readImage(BufferedImage img) throws IOException {
+		PrintWriter writer = new PrintWriter("input.txt", "UTF-8");
+		int height, width;
+		int rgb, r, g, b;
+
+		height = img.getHeight();
+		width = img.getWidth();
+
+		writer.println(width);
+		writer.println(height);
+
+		for(int j = 0; j < height; j++) {
+			for(int i = 0; i < width; i++) {
+				rgb = img.getRGB(i, j);
+				r = (rgb >> 16) & 0xFF;
+				g = (rgb >> 8) & 0xFF;
+				b = (rgb >> 0) & 0xFF;
+				writer.println(r + " " + g + " " + b);
+			}
+		}
+
+		writer.close();
+	}
+}
