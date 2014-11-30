@@ -14,7 +14,6 @@ void store_images();
 void process_images();
 int compute_sum_rgb();
 RGB ** allocatePixelMatrix (int x, int y);
-void output_image();
 
 /*
 BLOCKS:
@@ -35,8 +34,6 @@ int main(int argc, char *argv[]) {
 	store_images();
 
 	process_images();
-
-	output_image();
 }
 
 void store_images() {
@@ -45,12 +42,12 @@ void store_images() {
 
 
 	// FRANK'S TEST BELOW -- WILL EVENTUALLY BE DELETED
-	int test = rand() % 20 + 30;
+	int test = rand() % 50;
 	//prev (33,63), curr (33,78)
-	img_prev[test][test].R = 100;
-	img_prev[test][test].G = 100;
-	img_curr[test-5][test+5].R = 100;
-	img_curr[test-5][test+5].G = 100;
+	img_prev[test][test+30].R = 100;
+	img_prev[test][test+30].G = 100;
+	img_curr[test][test+45].R = 100;
+	img_curr[test][test+45].G = 100;
 	printf("TEST %d\n", test);
 }
 
@@ -172,62 +169,4 @@ int compute_sum_rgb(int k, int l, int curr) {
 	}
 	//printf("Block %d %d %d: %d\n", k, l, curr, total_RGB);
 	return total_RGB;
-}
-
-void output_image() {
-	FILE *f;
-	unsigned char *img = NULL;
-	int filesize = 54 + 3 * n * m;
-	if(img)
-	    free( img );
-
-	img = (unsigned char *)malloc(3 * n * m);
-	memset(img, 0, sizeof(img));
-
-	int i, j;
-	int x, y;
-	int r, g, b;
-
-	for(i = 0; i < n; i++) {
-	    for(j = 0; j < m; j++) {
-	    x = i; 
-	    y = (m - 1) - j;
-	    r = img_prev[i][j].R;
-	    g = img_prev[i][j].G;
-	    b = img_prev[i][j].B;
-	    if (r > 255) r = 255;
-	    if (g > 255) g = 255;
-	    if (b > 255) b = 255;
-	    img[(x + y * n) * 3 + 2] = (unsigned char)(r);
-	    img[(x + y * n) * 3 + 1] = (unsigned char)(g);
-	    img[(x + y * n) * 3 + 0] = (unsigned char)(b);
-	}
-	}
-
-	unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
-	unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
-	unsigned char bmppad[3] = {0,0,0};
-
-	bmpfileheader[2] = (unsigned char)(filesize    );
-	bmpfileheader[3] = (unsigned char)(filesize>> 8);
-	bmpfileheader[4] = (unsigned char)(filesize>>16);
-	bmpfileheader[5] = (unsigned char)(filesize>>24);
-
-	bmpinfoheader[4] = (unsigned char)(       n    );
-	bmpinfoheader[5] = (unsigned char)(       n>> 8);
-	bmpinfoheader[6] = (unsigned char)(       n>>16);
-	bmpinfoheader[7] = (unsigned char)(       n>>24);
-	bmpinfoheader[8] = (unsigned char)(       m    );
-	bmpinfoheader[9] = (unsigned char)(       m>> 8);
-	bmpinfoheader[10] = (unsigned char)(       m>>16);
-	bmpinfoheader[11] = (unsigned char)(       m>>24);
-
-	f = fopen("IsmgTest.bmp","wb");
-	fwrite(bmpfileheader,1,14,f);
-	fwrite(bmpinfoheader,1,40,f);
-	for(i = 0; i < m; i++) {
-	    fwrite(img + (n * (m - i - 1) * 3), 3, n, f);
-	    fwrite(bmppad, 1, (4 - (n * 3) % 4) % 4, f);
-	}
-	fclose(f);
 }
