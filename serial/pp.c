@@ -1,20 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "common.h"
 
 int m = 50; //Number of rows in the image
 int n = 100; //Number of columns in the image
 int b; //Size of the block
 int step_size_initial = 16;
 
-RGB **img_prev; //Previous image RGB
-RGB **img_curr; //Current image RGB
+//Previous image RGB
+int **img_prev_r;
+int **img_prev_g;
+int **img_prev_b;
+
+//Current image RGB
+int **img_curr_r;
+int **img_curr_g;
+int **img_curr_b;
 
 void store_images();
+void load_images();
 void process_images();
 int compute_sum_rgb();
-RGB ** allocatePixelMatrix (int x, int y);
-void output_image();
 
 /*
 BLOCKS:
@@ -26,7 +31,7 @@ BLOCKS:
 int main(int argc, char *argv[]) {
 	srand(100);
 	if(argc != 2) {
-		printf("Usage: ./serialProgram <Block size>\n");
+		printf("Usage: ./pp <Block size>\n");
 		exit(1);
 	}
 
@@ -34,23 +39,102 @@ int main(int argc, char *argv[]) {
 
 	store_images();
 
-	process_images();
+	//load_images();
 
-	output_image();
+	process_images();
 }
 
 void store_images() {
-	img_prev = allocatePixelMatrix(m,n);
-	img_curr = allocatePixelMatrix(m,n);
+	int i, j;
 
+	printf("Storing images in matrices...\n");
 
-	// FRANK'S TEST BELOW -- WILL EVENTUALLY BE DELETED
-	int test = rand() % 20 + 30;
+	//Allocates memory to the matrices
+	img_prev_r = (int **)malloc(m * sizeof(int*));
+	img_prev_g = (int **)malloc(m * sizeof(int*));
+	img_prev_b = (int **)malloc(m * sizeof(int*));
+
+	img_curr_r = (int **)malloc(m * sizeof(int*));
+	img_curr_g = (int **)malloc(m * sizeof(int*));
+	img_curr_b = (int **)malloc(m * sizeof(int*));
+
+	for(i = 0; i < m; i++) {
+		img_prev_r[i] = (int *)malloc(n * sizeof(int));
+		img_prev_g[i] = (int *)malloc(n * sizeof(int));
+		img_prev_b[i] = (int *)malloc(n * sizeof(int));
+
+		img_curr_r[i] = (int *)malloc(n * sizeof(int));
+		img_curr_g[i] = (int *)malloc(n * sizeof(int));
+		img_curr_b[i] = (int *)malloc(n * sizeof(int));
+	}
+
+	//Initializes matrices to 0
+	for(i = 0; i < m; i++) {
+		for(j = 0; j < n; j++) {
+			img_prev_r[i][j] = 0;
+			img_prev_g[i][j] = 0;
+			img_prev_b[i][j] = 0;
+
+			img_curr_r[i][j] = 0;
+			img_curr_g[i][j] = 0;
+			img_curr_b[i][j] = 0;
+		}
+	}
+
+	int test = rand() % 50;
 	//prev (33,63), curr (33,78)
-	img_prev[test][test].R = 100;
-	img_prev[test][test].G = 100;
-	img_curr[test-5][test+5].R = 100;
-	img_curr[test-5][test+5].G = 100;
+	img_prev_r[test][test+30] = 100;
+	img_prev_g[test][test+30] = 100;
+	img_curr_r[test][test+45] = 100;
+	img_curr_g[test][test+45] = 100;
+	printf("TEST %d\n", test);
+}
+
+void load_images() {
+	int i, j;
+
+	printf("Loading images in matrices...\n");
+
+	//Bitmap bitmap = new Bitmap(@"")
+
+	//Allocates memory to the matrices
+	img_prev_r = (int **)malloc(m * sizeof(int*));
+	img_prev_g = (int **)malloc(m * sizeof(int*));
+	img_prev_b = (int **)malloc(m * sizeof(int*));
+
+	img_curr_r = (int **)malloc(m * sizeof(int*));
+	img_curr_g = (int **)malloc(m * sizeof(int*));
+	img_curr_b = (int **)malloc(m * sizeof(int*));
+
+	for(i = 0; i < m; i++) {
+		img_prev_r[i] = (int *)malloc(n * sizeof(int));
+		img_prev_g[i] = (int *)malloc(n * sizeof(int));
+		img_prev_b[i] = (int *)malloc(n * sizeof(int));
+
+		img_curr_r[i] = (int *)malloc(n * sizeof(int));
+		img_curr_g[i] = (int *)malloc(n * sizeof(int));
+		img_curr_b[i] = (int *)malloc(n * sizeof(int));
+	}
+
+	//Initializes matrices to 0
+	for(i = 0; i < m; i++) {
+		for(j = 0; j < n; j++) {
+			img_prev_r[i][j] = 0;
+			img_prev_g[i][j] = 0;
+			img_prev_b[i][j] = 0;
+
+			img_curr_r[i][j] = 0;
+			img_curr_g[i][j] = 0;
+			img_curr_b[i][j] = 0;
+		}
+	}
+
+	int test = rand() % 50;
+	//prev (33,63), curr (33,78)
+	img_prev_r[test][test+30] = 100;
+	img_prev_g[test][test+30] = 100;
+	img_curr_r[test][test+45] = 100;
+	img_curr_g[test][test+45] = 100;
 	printf("TEST %d\n", test);
 }
 
@@ -154,14 +238,14 @@ int compute_sum_rgb(int k, int l, int curr) {
 	for(i = k; i < k + b; i++) {
 		for(j = l; j < l + b; j++) {
 			if(curr == 0) {
-				total_RGB += img_prev[i][j].R;
-				total_RGB += img_prev[i][j].G;
-				total_RGB += img_prev[i][j].B;
+				total_RGB += img_prev_r[i][j];
+				total_RGB += img_prev_g[i][j];
+				total_RGB += img_prev_b[i][j];
 			}
 			else if(curr == 1) {
-				total_RGB += img_curr[i][j].R;
-				total_RGB += img_curr[i][j].G;
-				total_RGB += img_curr[i][j].B;
+				total_RGB += img_curr_r[i][j];
+				total_RGB += img_curr_g[i][j];
+				total_RGB += img_curr_b[i][j];
 			}
 			else {
 				printf("Error reading block due to the input matrix\n");
@@ -172,62 +256,4 @@ int compute_sum_rgb(int k, int l, int curr) {
 	}
 	//printf("Block %d %d %d: %d\n", k, l, curr, total_RGB);
 	return total_RGB;
-}
-
-void output_image() {
-	FILE *f;
-	unsigned char *img = NULL;
-	int filesize = 54 + 3 * n * m;
-	if(img)
-	    free( img );
-
-	img = (unsigned char *)malloc(3 * n * m);
-	memset(img, 0, sizeof(img));
-
-	int i, j;
-	int x, y;
-	int r, g, b;
-
-	for(i = 0; i < n; i++) {
-	    for(j = 0; j < m; j++) {
-	    x = i; 
-	    y = (m - 1) - j;
-	    r = img_prev[i][j].R;
-	    g = img_prev[i][j].G;
-	    b = img_prev[i][j].B;
-	    if (r > 255) r = 255;
-	    if (g > 255) g = 255;
-	    if (b > 255) b = 255;
-	    img[(x + y * n) * 3 + 2] = (unsigned char)(r);
-	    img[(x + y * n) * 3 + 1] = (unsigned char)(g);
-	    img[(x + y * n) * 3 + 0] = (unsigned char)(b);
-	}
-	}
-
-	unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
-	unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
-	unsigned char bmppad[3] = {0,0,0};
-
-	bmpfileheader[2] = (unsigned char)(filesize    );
-	bmpfileheader[3] = (unsigned char)(filesize>> 8);
-	bmpfileheader[4] = (unsigned char)(filesize>>16);
-	bmpfileheader[5] = (unsigned char)(filesize>>24);
-
-	bmpinfoheader[4] = (unsigned char)(       n    );
-	bmpinfoheader[5] = (unsigned char)(       n>> 8);
-	bmpinfoheader[6] = (unsigned char)(       n>>16);
-	bmpinfoheader[7] = (unsigned char)(       n>>24);
-	bmpinfoheader[8] = (unsigned char)(       m    );
-	bmpinfoheader[9] = (unsigned char)(       m>> 8);
-	bmpinfoheader[10] = (unsigned char)(       m>>16);
-	bmpinfoheader[11] = (unsigned char)(       m>>24);
-
-	f = fopen("IsmgTest.bmp","wb");
-	fwrite(bmpfileheader,1,14,f);
-	fwrite(bmpinfoheader,1,40,f);
-	for(i = 0; i < m; i++) {
-	    fwrite(img + (n * (m - i - 1) * 3), 3, n, f);
-	    fwrite(bmppad, 1, (4 - (n * 3) % 4) % 4, f);
-	}
-	fclose(f);
 }

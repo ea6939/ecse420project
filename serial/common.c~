@@ -14,13 +14,13 @@ RGB ** allocatePixelMatrix (int x, int y)
   return matrix;
 }
 
-vector ** allocate_motion_vector_matrix (int x, int y, int block_size)
+vector ** allocate_motion_vector_matrix (int x, int y)
 {
   int i;
   vector **matrix;
-  matrix = (vector **)malloc((x/block_size) * sizeof(vector*));
+  matrix = (vector **)malloc(x * sizeof(vector*));
   for (i=0; i<x; i++)
-    matrix[i] = (vector *) malloc((y/block_size) * sizeof(vector));
+    matrix[i] = (vector *) malloc(y * sizeof(vector));
 
   return matrix;
 }
