@@ -20,7 +20,7 @@ public class ImageReader {
 			try {
 				img = ImageIO.read(imgFile);
 
-				readImage(img,args[1]);
+				readImage(img);
 			}
 			catch(IOException e) {}
 		}
@@ -30,8 +30,8 @@ public class ImageReader {
 		}
 	}
 
-	static void readImage(BufferedImage img, String name) throws IOException {
-		PrintWriter writer = new PrintWriter(name, "UTF-8");
+	static void readImage(BufferedImage img) throws IOException {
+		PrintWriter writer = new PrintWriter(args[1], "UTF-8");
 		int height, width;
 		int rgb, r, g, b;
 
