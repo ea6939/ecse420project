@@ -1,0 +1,11 @@
+openCL: openCL.o common.o
+	gcc -O0 -o openCL openCL.o common.o
+
+openCL.o: openCL.c common.h
+	gcc -O0 -c openCL.c
+
+common.o: common.c common.h
+	gcc -O0 -c common.c
+
+clean:
+	rm *.o openCL
