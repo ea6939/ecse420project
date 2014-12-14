@@ -1,0 +1,68 @@
+#include "common.h"
+
+int width;
+int height;
+
+void import_image_from_text(RGB** img, char* img_path){
+	FILE *image;
+	
+	int i, j;
+	
+	image=fopen(img_path,"rb+");
+	
+	if(image==NULL)
+	{
+		printf("Error! Image failed to open.");
+	}
+	
+	char line[80];
+	fgets(line, 80, image);
+	sscanf (line, "%d", &width);
+	
+	fgets(line, 80, image);
+	sscanf (line, "%d", &height);
+	
+	
+	
+	for(i=0; i<width*height; i++){
+		fgets(line, 80, image);
+		sscanf (line, "%d %d %d", &img[i/width][i%width].R, &img[i/width][i%width].G, &img[i/width][i%width].B);
+		
+		//printf("%d %d %d | ",img[i/width][i%width].R,img[i/width][i%width].G,img[i/width][i%width].B);
+		//if(i!=0 && (i+1)%width==0)printf("\n");
+	}
+	//printf("\n");
+	
+	fclose(image);
+}
+
+void export_image_to_text(RGB** img, char* img_path_out){
+	FILE *image;
+	
+	int i, j;
+	
+	image=fopen(img_path_out,"w");
+	
+	if(image==NULL)
+	{
+		printf("Error! Image failed to open.");
+	}
+	
+	fprintf(image,"%d\n",width);
+	fprintf(image,"%d\n",height);
+	
+	for(i=0; i<width*height; i++){
+		fprintf(image,"%d %d %d\n",img[i/width][i%width].R,img[i/width][i%width].G,img[i/width][i%width].B);
+	}
+	
+	fclose(image);
+
+}
+
+int get_width(){
+	return width;
+}
+
+int get_height(){
+	return height;
+}
