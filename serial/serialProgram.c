@@ -29,7 +29,7 @@ BLOCKS:
 int main(int argc, char *argv[]) {
 	srand(100);
 	if(argc != 3) {
-		printf("Usage: ./serialProgram <Block size>\n");
+		printf("Usage: ./serialProgram <Block size> <Step size>\n");
 		exit(1);
 	}
 	block_size = atoi(argv[1]);
@@ -77,27 +77,8 @@ int main(int argc, char *argv[]) {
 	
 	int k,l;
 	
-	/*
-	printf("\nmotion vectors: (x,y)\n");
-	for(k = 0; k < m / block_size; k++) { // rows
-		for(l = 0; l < n / block_size; l++) { // columns
-			printf("(%d,%d) ",motion_vectors[k][l].x,motion_vectors[k][l].y);
-		}
-		printf("\n");
-	}
-	*/
-	
 	// in production currently
 	img_w_applied_mv = apply_motion_vectors(img_prev, motion_vectors, n, m);
-	/*
-	printf("\nimage w applied motion vectors:\n");
-	for(k = 0; k < m; k++) { // rows
-		for(l = 0; l < n; l++) { // columns
-			printf("%d,%d,%d | ",img_w_applied_mv[k][l].R,img_w_applied_mv[k][l].G,img_w_applied_mv[k][l].B);
-		}
-		printf("\n");
-	}
-	*/
 	
 	export_image_to_text(img_w_applied_mv,"./test_out");
 	
@@ -110,11 +91,8 @@ void process_images() {
 
 	//Property 1. Sum of RGB
 	// loop through all the blocks
-	for(k = 0; k < m / block_size; k++) { // rows
-		for(l = 0; l < n / block_size; l++) { // columns
-			//if(k==0) printf("%d, l: %d\n",img_prev[0][l*block_size].R,l);
-			//printf("for loop k: %d\n",k);
-			//printf("for loop l: %d\n\n",l);
+	for(k = 0; k < m / block_size; k++) {
+		for(l = 0; l < n / block_size; l++) {
 			int step_size = step_size_initial;
 			int curr_k, curr_l; //Temporary k and l variables to keep track of position
 
@@ -369,9 +347,12 @@ RGB** apply_motion_vectors(RGB** img_in, vector** motion, int width, int height)
 				
 				for(i=k*block_size; i<k*block_size+block_size; i++){
 					for(j=l*block_size; j<l*block_size+block_size; j++){
-						img_out[i][j].R = avg_R;
-						img_out[i][j].G = avg_G;
-						img_out[i][j].B = avg_B;
+						//img_out[i][j].R = avg_R;
+						//img_out[i][j].G = avg_G;
+						//img_out[i][j].B = avg_B;
+						img_out[i][j].R = 0;
+						img_out[i][j].G = 0;
+						img_out[i][j].B = 0;
 					}
 				}
 				
@@ -420,11 +401,8 @@ void process_images_using_avg() {
 
 	//Property 1. Sum of RGB
 	// loop through all the blocks
-	for(k = 0; k < m / block_size; k++) { // rows
-		for(l = 0; l < n / block_size; l++) { // columns
-			//if(k==0) printf("%d, l: %d\n",img_prev[0][l*block_size].R,l);
-			//printf("for loop k: %d\n",k);
-			//printf("for loop l: %d\n\n",l);
+	for(k = 0; k < m / block_size; k++) {
+		for(l = 0; l < n / block_size; l++) {
 			int step_size = step_size_initial;
 			int curr_k, curr_l; //Temporary k and l variables to keep track of position
 

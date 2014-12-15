@@ -1,0 +1,19 @@
+#!/bin/bash
+cd serial
+
+echo "Compiling..."
+javac ImageReader.java
+javac ImageWriter.java
+make
+
+echo "Reading Images..."
+java ImageReader prev.png f1.txt
+java ImageReader curr.png f2.txt
+
+echo "Computing TSSBMA serially..."
+./serialProgram $1 $2
+
+echo "Outputing image..."
+java ImageWriter test_out output.png
+
+cd ..
